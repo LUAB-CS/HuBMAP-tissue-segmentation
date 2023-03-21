@@ -6,7 +6,8 @@
 - `evaluation` and `submission` contain scripts related to performance evaluation and submission for the challenge;
 - `utils` will be used to store utilities, custom scripts that can be called anywhere;
 - `models` embeds the deep learning models;
-- `notebooks` contains all Jupyter notebooks, used for launching the whole pipeline.
+- `notebooks` contains all Jupyter notebooks, used for launching the whole pipeline;
+- `data` is not tracked by git and should contain the data from Kaggle.
 
 ## Requirements
 Use `pip install -r requirements.txt` to install all modules necessary to run the project into your virtual environment.
