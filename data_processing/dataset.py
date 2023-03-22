@@ -21,7 +21,7 @@ resized_dir = os.path.join(data_dir,'resized_images')
 meta_df = pd.read_csv(meta_path).sort_values(by = 'id')
 
 class CustomDataset(Dataset):
-    def __init__(self, root_dir = data_dir, transform=None):
+    def __init__(self, root_dir, transform=None):
         self.root_dir = root_dir
         self.transform = transform
         self.image_files = os.listdir(os.path.join(root_dir, "train_images"))
@@ -39,11 +39,13 @@ class CustomDataset(Dataset):
         image_tensor = torch.tensor(image)
         label = tifffile.imread(label_path)
         label_tensor = torch.tensor(label)
+        organ = meta_df[meta_df["id"] == int(self.image_files[idx][:-5])]["organ"].values[0]
         if self.transform is not None:
             image_tensor = self.transform(image_tensor)
             label_tensor = self.transform(label_tensor)
             return (image_tensor, label_tensor)
-        return (image_tensor, label_tensor)
+        return (image_tensor, organ, label_tensor)
 
-train_dataset = CustomDataset()
+train_dataset = CustomDataset(root_dir = data_dir)
 
+print(train_dataset[0])
