@@ -1,14 +1,8 @@
 import os
 import torch
-import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
-import cv2
-from PIL import Image
 import tifffile
-import json
-import torchvision.transforms as transforms
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 
 
 class CustomDataset(Dataset):
@@ -32,7 +26,7 @@ class CustomDataset(Dataset):
         if self.transform is not None:
             image_tensor = self.transform(image)
             label_tensor = self.transform(label)
-            return (image_tensor, label_tensor)
+            return (image_tensor, organ, label_tensor)
         else:
             image_tensor = torch.tensor(image).T
             label_tensor = torch.tensor(label).T
