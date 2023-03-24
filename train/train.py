@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import time
 import numpy as np
+from tqdm import tqdm
 
 def main_train(model, loss_fn, optimizer, n_epochs, dataloader, device) -> None:
     # Put model in train mode
@@ -18,14 +19,12 @@ def main_train(model, loss_fn, optimizer, n_epochs, dataloader, device) -> None:
 
         train_loss = 0
 
-        #############################################
-        #for X, y in TRAIN_DATALOADER:
-        for X, y in dataloader:
+        for X, organ, y in tqdm(dataloader):
             # 1. Forward pass
             model_output = model(X.to(device))
 
             # 2. Calculate and accumulate loss
-            loss = loss_fn(model_output,y)
+            loss = loss_fn(model_output,y.to(device)) #model_output[:,1,:,:] correspond au masque de la classe 2 = la zone d'intérêt, la classe 1 correpsond ua background
             train_loss += loss.item()
 
             # 3. Optimizer zero grad
