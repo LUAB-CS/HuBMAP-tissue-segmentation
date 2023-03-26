@@ -53,7 +53,7 @@ def rle2mask(rle,shape):
 
 def create_masks_as_tiff(data_dir):
     meta_df = pd.read_csv(os.path.join(data_dir,'train.csv'))
-    if 'train_mask' not in os.listdir(data_dir):
+    if 'train_masks' not in os.listdir(data_dir):
         os.mkdir(os.path.join(data_dir, 'train_masks'))
 
     for image in os.listdir(os.path.join(data_dir,'train_images')):
