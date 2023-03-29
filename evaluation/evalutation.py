@@ -8,9 +8,7 @@ IoUs = [] # TO BUILD, compute IoUs for different value of the threshold
 def plot_validation_predictions(v, threshold_best, n):
     """
     Code inspo from : https://www.kaggle.com/code/markwijkhuizen/hubmap-hpa-hacking-the-human-body-training
-
     TO UPDATE WHEN MODEL IS OUT
-
     Input :
     v : validation dataset contatine : images, GT masks, organ, predicted mask
     threshold_best : threshold for predicted mask (each pixel is assigned a probability to be part of the mask)

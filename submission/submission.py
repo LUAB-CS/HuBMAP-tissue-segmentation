@@ -11,7 +11,7 @@ def make_submission(model, test_dataset, threshold):
 
     # From binary arrays to run-length encoding
     linestart = None
-    for id, mask in enumerate(prediction):
+    for id, mask in enumerate(prediction): # Depend on the test dataloader
         mask_size = mask.shape[0]
         submission["id"].append(id)
         rle = []
