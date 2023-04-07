@@ -1,41 +1,41 @@
-import os
-import numpy as np
-import pandas as pd
-import tifffile
-import torch
 import torchvision.transforms.functional as F
 import torchvision.transforms as transforms
 import random as r
 
 #Toutes les augmentations sont visualisables dans data_augmentation_check.ipynb
 
-class RandomFlip(object):
+class RandomHorizontalFlip(object):
 
     def __call__(self, item):
         image, mask = item
         if r.random() > 0.5:
             return item
-        image = image.flip(dims=0)
-        mask = mask.flip(dims=0)
+        image = image.flip(dims=(0,))
+        mask = mask.flip(dims=(0,))
         return (image,mask)
-    
+
+class RandomVerticalFlip(object):
+
+    def __call__(self, item):
+        image, mask = item
+        if r.random() > 0.5:
+            return item
+        image = image.flip(dims=(1,))
+        mask = mask.flip(dims=(1,))
+        return (image,mask)
 
 class RandomRotation(object):
 
     def angle(self):
         #Sens de rotation
         return r.uniform(-180,180)
-    
+
     def __call__(self,item):
         image,mask = item
         angle = self.angle()
-        image = image.permute(2,0,1)
         image = F.rotate(image,angle=angle)
-        image = image.permute(1,2,0)
-        mask = F.rotate(mask[None,:],angle)
-        return (image,mask.squeeze())
-
-
+        mask = F.rotate(mask,angle)
+        return (image,mask)
 
 class CustomColorJitter(object):
 
@@ -46,11 +46,8 @@ class CustomColorJitter(object):
 
     def __call__(self,item):
         image, mask = item
-        image = image.permute(2,0,1)
         image = transforms.ColorJitter(brightness=self.brightness,hue=self.hue,saturation=self.saturation)(image)
-        image = image.permute(1,2,0)
         return (image,mask)
-
 
 class RandomBlur(object):
 
@@ -62,19 +59,5 @@ class RandomBlur(object):
         image, mask = item
         if r.random() > self.blurred_ratio:
             return item
-        image = image.permute(2,0,1)
         image = F.gaussian_blur(image,kernel_size=self.kernel_size)
-        image = image.permute(1,2,0)
         return (image,mask)
-    
-data_transform = transforms.Compose([
-    RandomFlip(),
-    RandomRotation(),
-    CustomColorJitter(),
-    RandomBlur()
-])
-
-data_transform((torch.randn(3000,3000,3),torch.randn(3000,3000)))
-
-
-
