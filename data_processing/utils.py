@@ -1,8 +1,10 @@
 import os
 import numpy as np
 from data_processing.dataset import CustomDataset
+from data_processing.augmentation import RandomBlur, RandomRotation, RandomHorizontalFlip, RandomVerticalFlip, CustomColorJitter
 from torch.utils.data import DataLoader
 from torch.utils.data.dataset import random_split
+import torchvision.transforms as transforms
 
 
 def get_training_datasets_and_dataloaders(
@@ -19,7 +21,13 @@ def get_training_datasets_and_dataloaders(
     Load the training and test datasets into data loaders.
     """
 
-    transform = None
+    transform = transforms.Compose([
+        RandomHorizontalFlip(),
+        RandomVerticalFlip(),
+        RandomRotation(),
+        CustomColorJitter(),
+        RandomBlur()
+    ])
 
     total_dataset = CustomDataset(root_dir = root_dir, reshape_size = 1024, transform=transform)
     train_dataset, validation_dataset = random_split(total_dataset,[0.8,0.2])
