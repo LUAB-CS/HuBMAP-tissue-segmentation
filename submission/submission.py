@@ -5,7 +5,27 @@ original picture.
 
 import numpy as np
 import pandas as pd
-def make_submission(model, test_dataset, threshold):
+
+
+def make_submission(model, test_df, test_dir, threshold):
+    for i,row in test_df.iterrows():
+        try:
+            idx = row["id"]
+            img_path = img_path = f"{test_dir}/{idx}.tiff"
+            # Predicted Mask
+            y_pred_binary = (y_pred > threshold_best).astype(np.uint8)
+            mask = model(img_path=img_path,threshold = 220,plot=True)
+    #         gt_mask = rleToMask(row['rle'],row["img_width"],row["img_height"])
+    #         dice_coeff.append(dice(mask,gt_mask))
+
+            # if i>4:
+            #     break
+            plt.imshow(mask,cmap = "gray")
+            rles.append(rle_encode(mask))
+
+        except:
+            print(f"error in {i}")
+            continue
     prediction = model(test_dataset) # I will update the beginning of the script to fit the other's work
     submission = {'id':[], 'rle':[]}
 
@@ -22,7 +42,7 @@ def make_submission(model, test_dataset, threshold):
                     lineend = k * mask_size + l - 1
                     rle = rle + f"{linestart} {lineend} "
                     linestart = None
-                if linestart and l == mask_size - 1 # Segment end at border
+                if linestart and l == mask_size - 1:# Segment end at border
                     lineend = k * mask_size + l
                     rle = rle + f"{linestart} {lineend} "
                     linestart = None
