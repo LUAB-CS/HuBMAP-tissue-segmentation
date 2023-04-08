@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from data_processing.dataset import CustomDataset
+from data_processing.dataset import CustomDataset, CustomTestDataset
 from data_processing.augmentation import RandomBlur, RandomRotation, RandomHorizontalFlip, RandomVerticalFlip, CustomColorJitter
 from torch.utils.data import DataLoader
 from torch.utils.data.dataset import random_split
@@ -38,3 +38,23 @@ def get_training_datasets_and_dataloaders(
         return train_dataset, validation_dataset, train_dl, validation_dl
 
     return train_dataset, validation_dataset, None, None
+
+def get_test_dataset_and_dataloader(
+    batch_size: int = 4,
+    input_size: int = 1024,
+    root_dir: str = os.path.join('..','data')
+) -> tuple[
+    CustomTestDataset,
+    DataLoader
+]:
+    """
+    Load the training and test datasets into data loaders.
+    """
+
+    test_dataset = CustomTestDataset(root_dir = root_dir, reshape_size = 1024)
+
+    if batch_size > 1:
+        test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
+        return test_dataset, test_dl
+
+    return test_dataset, None
