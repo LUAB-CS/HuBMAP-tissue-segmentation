@@ -3,6 +3,7 @@ import torch.nn as nn
 import time
 import numpy as np
 from tqdm import tqdm
+from datetime import datetime
 
 def main_train(model, loss_fn, optimizer, n_epochs, dataloader, device) -> None:
     # Put model in train mode
@@ -45,6 +46,10 @@ def main_train(model, loss_fn, optimizer, n_epochs, dataloader, device) -> None:
             f" time spent during this epoch = {time.time() - start_time_epoch:.2f}s,"
             f" total time spent = {time.time() - start_time_global:.2f}s"
         )
+        if epoch % 10 == 0 :
+
+            torch.save(model, f"../model_save/save_epoch_{epoch}_{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.pt")
+
 
     return loss_list
 
@@ -89,5 +94,9 @@ def main_train_batch1(model, loss_fn, optimizer, n_epochs, dataset, device) -> N
             f" time spent during this epoch = {time.time() - start_time_epoch:.2f}s,"
             f" total time spent = {time.time() - start_time_global:.2f}s"
         )
+
+        if epoch % 10 == 0 :
+
+            torch.save(model, f"../model_save/save_epoch_{epoch}_{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.pt")
 
     return loss_list
