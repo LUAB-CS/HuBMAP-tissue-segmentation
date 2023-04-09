@@ -20,6 +20,7 @@ def main_train(model, loss_fn, optimizer, n_epochs, dataloader, device) -> None:
         train_loss = 0
 
         for X, organ, y in tqdm(dataloader):
+            print(X.shape, organ, y.shape)
             # 1. Forward pass
             model_output = model(X.to(device))
 
