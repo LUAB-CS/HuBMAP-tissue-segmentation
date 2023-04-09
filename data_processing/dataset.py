@@ -6,7 +6,7 @@ import torchvision.transforms as transforms
 
 
 class CustomDataset(Dataset):
-    def __init__(self, root_dir, reshape_size, transform=None):
+    def __init__(self, root_dir: str, reshape_size: int, transform=None):
         self.root_dir = root_dir
         self.transform = transform
         self.image_files = os.listdir(os.path.join(root_dir, "train_images"))
