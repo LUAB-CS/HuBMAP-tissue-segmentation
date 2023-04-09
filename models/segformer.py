@@ -3,12 +3,13 @@ from torch import nn
 from einops import rearrange
 from torchvision.ops import StochasticDepth
 from typing import List, Iterable
+import torch.nn.functional as F
 
 class LayerNorm2d(nn.LayerNorm):
-    '''Necessary if input is not of shape  batch_size / channels / height / width to use torch normalization layer'''
+    '''Necessary to use torch normalization layer on data batch_size / channels / height / width'''
     def forward(self, x):
         x = x.permute(0, 2, 3, 1) # swap channel axis with last one
-        x = super().forward(x)    # apply layer norm
+        x = super().forward(x)    # apply layer normalization over channels
         x = x.permute(0, 3, 1, 2) # swap back
         return x
     
@@ -246,7 +247,8 @@ class SegFormer(nn.Module):
         features = self.encoder(x)
         features = self.decoder(features[::-1])
         segmentation = self.head(features)
-        return segmentation
+        seg_upsampled = F.interpolate(segmentation, size=(input.shape[2], input.shape[3]), mode='nearest')
+        return seg_upsampled
 
 # TODO -> clean code, check shapes
 # Uncomment to test architecture
