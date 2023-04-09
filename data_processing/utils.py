@@ -29,7 +29,7 @@ def get_training_datasets_and_dataloaders(
         RandomBlur()
     ])
 
-    total_dataset = CustomDataset(root_dir = root_dir, reshape_size = 1024, transform=transform)
+    total_dataset = CustomDataset(root_dir = root_dir, reshape_size = input_size, transform=transform)
     train_dataset, validation_dataset = random_split(total_dataset,[0.8,0.2])
 
     validation_dataset.transfrom = None
@@ -53,7 +53,7 @@ def get_test_dataset_and_dataloader(
     Load the training and test datasets into data loaders.
     """
 
-    test_dataset = CustomTestDataset(root_dir = root_dir, reshape_size = 1024)
+    test_dataset = CustomTestDataset(root_dir = root_dir, reshape_size = input_size)
 
     if batch_size > 1:
         test_dl = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
