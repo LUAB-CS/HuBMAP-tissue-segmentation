@@ -25,12 +25,14 @@ def get_training_datasets_and_dataloaders(
         RandomHorizontalFlip(),
         RandomVerticalFlip(),
         RandomRotation(),
-        CustomColorJitter(),
+        #CustomColorJitter(),
         RandomBlur()
     ])
 
     total_dataset = CustomDataset(root_dir = root_dir, reshape_size = 1024, transform=transform)
     train_dataset, validation_dataset = random_split(total_dataset,[0.8,0.2])
+
+    validation_dataset.transfrom = None
 
     if batch_size > 1:
         train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
