@@ -5,7 +5,7 @@ from data_processing.augmentation import RandomBlur, RandomRotation, RandomHoriz
 from torch.utils.data import DataLoader
 from torch.utils.data.dataset import random_split
 import torchvision.transforms as transforms
-
+import torch
 
 def get_training_datasets_and_dataloaders(
     batch_size: int = 4,
@@ -29,8 +29,9 @@ def get_training_datasets_and_dataloaders(
         RandomBlur()
     ])
 
+    generator = torch.Generator().manual_seed(0)
     total_dataset = CustomDataset(root_dir = root_dir, reshape_size = input_size, transform=transform)
-    train_dataset, validation_dataset = random_split(total_dataset,[0.8,0.2])
+    train_dataset, validation_dataset = random_split(total_dataset,[0.8,0.2], generator=generator)
 
     validation_dataset.transfrom = None
 
