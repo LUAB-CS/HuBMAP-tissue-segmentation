@@ -64,6 +64,7 @@ class DebugCustomDataset(Dataset):
         return len(self.image_files)
 
     def __getitem__(self, idx):
+        print(self.image_files[idx][:-5])
         image_path = os.path.join(self.root_dir, "debug_train_images", self.image_files[idx])
         label_path = os.path.join(self.root_dir, "debug_train_masks", self.label_files[idx])
         image = tifffile.imread(image_path)

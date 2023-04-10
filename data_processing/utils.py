@@ -30,9 +30,9 @@ def get_training_datasets_and_dataloaders(
         RandomBlur()
     ])
     if mode == "debug":
-        total_dataset = DebugCustomDataset(root_dir = root_dir, reshape_size = 1024, transform=transform)
+        total_dataset = DebugCustomDataset(root_dir = root_dir, reshape_size = input_size, transform=transform)
     else :
-        total_dataset = CustomDataset(root_dir = root_dir, reshape_size = 1024, transform=transform)
+        total_dataset = CustomDataset(root_dir = root_dir, reshape_size = input_size, transform=transform)
     encoder = total_dataset.encoder
     train_dataset, validation_dataset = random_split(total_dataset,[0.8,0.2])
 
