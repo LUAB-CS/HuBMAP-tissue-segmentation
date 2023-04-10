@@ -1,9 +1,10 @@
 import torch
 import torch.nn as nn
 
+
 class Squeeze_Excite(nn.Module):
 
-    def __init__(self,channel,reduction):
+    def __init__(self, channel, reduction):
         super().__init__()
         self.avgpool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
@@ -13,11 +14,12 @@ class Squeeze_Excite(nn.Module):
             nn.Sigmoid()
         )
 
-    def forward(self,x):
+    def forward(self, x):
         b, c, _, _ = x.size()
         y = self.avgpool(x).view(b, c)
         y = self.fc(y).view(b, c, 1, 1)
         return x * y.expand_as(x)
+
 
 class VGGBlock(nn.Module):
 
@@ -28,9 +30,9 @@ class VGGBlock(nn.Module):
         self.bn1 = nn.BatchNorm2d(middle_channels)
         self.conv2 = nn.Conv2d(middle_channels, out_channels, 3, padding=1)
         self.bn2 = nn.BatchNorm2d(out_channels)
-        self.SE = Squeeze_Excite(out_channels,8)
+        self.SE = Squeeze_Excite(out_channels, 8)
 
-    def forward(self,x):
+    def forward(self, x):
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
@@ -40,7 +42,8 @@ class VGGBlock(nn.Module):
         out = self.relu(out)
         out = self.SE(out)
 
-        return(out)
+        return (out)
+
 
 class UNet(nn.Module):
 
@@ -50,37 +53,44 @@ class UNet(nn.Module):
         nb_filter = [32, 64, 128, 256, 512]
 
         self.pool = nn.MaxPool2d(2, 2)
-        self.up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
+        self.up = nn.Upsample(
+            scale_factor=2, mode='bilinear', align_corners=True)
 
         self.conv0_0 = VGGBlock(input_channels, nb_filter[0], nb_filter[0])
         self.conv1_0 = VGGBlock(nb_filter[0], nb_filter[1], nb_filter[1])
         self.conv2_0 = VGGBlock(nb_filter[1], nb_filter[2], nb_filter[2])
         self.conv3_0 = VGGBlock(nb_filter[2], nb_filter[3], nb_filter[3])
-        #self.conv4_0 = VGGBlock(nb_filter[3], nb_filter[4], nb_filter[4])
+        self.conv4_0 = VGGBlock(nb_filter[3], nb_filter[4], nb_filter[4])
 
-        #self.conv3_1 = VGGBlock(nb_filter[3]+nb_filter[4], nb_filter[3], nb_filter[3])
-        self.conv2_2 = VGGBlock(nb_filter[2]+nb_filter[3], nb_filter[2], nb_filter[2])
-        self.conv1_3 = VGGBlock(nb_filter[1]+nb_filter[2], nb_filter[1], nb_filter[1])
-        self.conv0_4 = VGGBlock(nb_filter[0]+nb_filter[1], nb_filter[0], nb_filter[0])
+        self.conv3_1 = VGGBlock(
+            nb_filter[3]+nb_filter[4], nb_filter[3], nb_filter[3])
+        self.conv2_2 = VGGBlock(
+            nb_filter[2]+nb_filter[3], nb_filter[2], nb_filter[2])
+        self.conv1_3 = VGGBlock(
+            nb_filter[1]+nb_filter[2], nb_filter[1], nb_filter[1])
+        self.conv0_4 = VGGBlock(
+            nb_filter[0]+nb_filter[1], nb_filter[0], nb_filter[0])
 
         self.final = nn.Conv2d(nb_filter[0], num_classes, kernel_size=1)
         # Organ
-        self.classifier = nn.Linear(nb_filter[3]*128*128, num_organs)
+        self.o_classifier = nn.Linear(nb_filter[4]*32*32, num_organs)
+        # Pixel Size
+        self.p_s_classifier = nn.Linear(nb_filter[4]*32*32, 1)
 
     def forward(self, input):
         x0_0 = self.conv0_0(input)
         x1_0 = self.conv1_0(self.pool(x0_0))
         x2_0 = self.conv2_0(self.pool(x1_0))
         x3_0 = self.conv3_0(self.pool(x2_0))
-        #x4_0 = self.conv4_0(self.pool(x3_0))
+        x4_0 = self.conv4_0(self.pool(x3_0))
+        # print(x4_0.shape)
+        o_classif_output = nn.Sigmoid()(self.o_classifier(x4_0.flatten(start_dim=1)))
+        p_s_classif_output = nn.Sigmoid()(self.p_s_classifier(x4_0.flatten(start_dim=1)))
 
-        print(x3_0.shape)
-        classif_output = self.classifier(x3_0.flatten())
-
-        #x3_1 = self.conv3_1(torch.cat([x3_0, self.up(x4_0)], 1))
-        x2_2 = self.conv2_2(torch.cat([x2_0, self.up(x3_0)], 1)) # x2_2 = self.conv2_2(torch.cat([x2_0, self.up(x3_1)], 1))
+        x3_1 = self.conv3_1(torch.cat([x3_0, self.up(x4_0)], 1))
+        x2_2 = self.conv2_2(torch.cat([x2_0, self.up(x3_1)], 1))
         x1_3 = self.conv1_3(torch.cat([x1_0, self.up(x2_2)], 1))
         x0_4 = self.conv0_4(torch.cat([x0_0, self.up(x1_3)], 1))
 
         output = self.final(x0_4)
-        return output, classif_output
+        return output, o_classif_output, p_s_classif_output

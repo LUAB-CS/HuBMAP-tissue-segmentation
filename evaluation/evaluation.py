@@ -38,7 +38,7 @@ def get_y_true_y_pred(val_pred):
         for t in thresholds:
             IoU = iou(y_true, (y_pred > t).astype(np.int8))
             IoUs[t].append(IoU)
-            IoUsOrgans[o][t].append(IoU)
+            IoUsOrgans[organ][t].append(IoU)
 
     return IoUs, IoUsOrgans
 
