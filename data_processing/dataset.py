@@ -8,7 +8,7 @@ import torchvision.transforms as transforms
 
 
 class CustomDataset(Dataset):
-    def __init__(self, root_dir, reshape_size, transform=None, normalize=True):
+    def __init__(self, root_dir, reshape_size, transform=None, normalize=False):
         self.root_dir = root_dir
         self.transform = transform
         self.image_files = os.listdir(os.path.join(root_dir, "train_images"))
@@ -18,19 +18,23 @@ class CustomDataset(Dataset):
             transforms.ToTensor(),
             transforms.Resize((reshape_size, reshape_size))
         ])
-        pixels = 0.0
-        psum = np.zeros(3).astype(float)
-        psum_sq = np.zeros(3).astype(float)
+        self.noramlize = normalize
+        if normalize:
+            pixels = 0.0
+            psum = np.zeros(3).astype(float)
+            psum_sq = np.zeros(3).astype(float)
 
-        for im_id in os.listdir(os.path.join(root_dir, "train_images")):
-            image_path = os.path.join(self.root_dir, "train_images", im_id)
-            img = tifffile.imread(image_path)
-            pixels += img.shape[0]*img.shape[1]
-            psum += np.sum(img.astype(float), axis=(0,1))
-            psum_sq += np.power(img.astype(float), 2).sum(axis=(0,1))
-        self.total_mean = psum/pixels
-        self.total_std = np.sqrt((psum_sq/pixels) - self.total_mean**2)
-        self.normalize = normalize
+            for im_id in os.listdir(os.path.join(root_dir, "train_images")):
+                image_path = os.path.join(self.root_dir, "train_images", im_id)
+                img = tifffile.imread(image_path)
+                pixels += img.shape[0]*img.shape[1]
+                psum += np.sum(img.astype(float), axis=(0,1))
+                psum_sq += np.power(img.astype(float), 2).sum(axis=(0,1))
+            self.total_mean = psum/pixels
+            self.total_std = np.sqrt((psum_sq/pixels) - self.total_mean**2)
+        else:
+            self.total_mean = None
+            self.total_std = None
         
 
     def __len__(self):
@@ -48,7 +52,9 @@ class CustomDataset(Dataset):
             (image_tensor, label_tensor) = self.transform((image_tensor, label_tensor))
             return (image_tensor, organ, label_tensor)
         if self.normalize:
+            image_tensor = image_tensor.permute(1,2,0)
             image_tensor = (image_tensor - self.total_mean)/self.total_std
+            image_tensor = image_tensor.permute(2,0,1)
 
         return (image_tensor, organ, label_tensor)
 
