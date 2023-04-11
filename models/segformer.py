@@ -247,7 +247,7 @@ class SegFormer(nn.Module):
         features = self.encoder(x)
         features = self.decoder(features[::-1])
         segmentation = self.head(features)
-        seg_upsampled = F.interpolate(segmentation, size=(input.shape[2], input.shape[3]), mode='nearest')
+        seg_upsampled = F.interpolate(segmentation, size=(x.shape[2], input.shape[3]), mode='nearest')
         return seg_upsampled
 
 # TODO -> clean code, check shapes

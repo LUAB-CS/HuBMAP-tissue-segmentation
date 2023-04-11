@@ -33,7 +33,7 @@ def get_training_datasets_and_dataloaders(
     total_dataset = CustomDataset(root_dir = root_dir, reshape_size = input_size, transform=transform)
     train_dataset, validation_dataset = random_split(total_dataset,[0.8,0.2], generator=generator)
 
-    validation_dataset.transfrom = None
+    validation_dataset.dataset.transform = None
 
     if batch_size > 1:
         train_dl = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)

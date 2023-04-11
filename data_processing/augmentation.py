@@ -61,3 +61,21 @@ class RandomBlur(object):
             return item
         image = F.gaussian_blur(image,kernel_size=self.kernel_size)
         return (image,mask)
+
+class RandomCrop(object):
+
+    def _init_(self, height = 512, width = 512,crop_ratio = 0.3):
+        self.height = height
+        self.width = width
+        self.crop_ratio = crop_ratio
+    
+    def _call_(self,item):
+        image, mask = item
+        C,H,W = mask.shape
+        if r.random() < self.crop_ratio:
+            top = r.randint(0,H - self.height)
+            left = r.randint(0, W - self.width)
+            image_crop = F.crop(image,top,left,self.height,self.width)
+            mask_crop = F.crop(mask,top,left,self.height,self.width)
+            return (image_crop,mask_crop)
+        return (image, mask)
