@@ -40,7 +40,7 @@ def get_training_datasets_and_dataloaders(
     generator = Generator().manual_seed(0)
     train_dataset, validation_dataset = random_split(
         total_dataset, [0.8, 0.2], generator=generator)
-
+    validation_dataset.dataset.transform = None
     if batch_size > 1:
         train_dl = DataLoader(
             train_dataset, batch_size=batch_size, shuffle=True)
