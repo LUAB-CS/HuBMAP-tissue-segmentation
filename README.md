@@ -11,3 +11,8 @@
 
 ## Requirements
 Use `pip install -r requirements.txt` to install all modules necessary to run the project into your virtual environment.
+
+## How to run the code
+Use the notebooks `example.ipynb` to launch experiments. The model and parameters have to be chosen there (see commented stuff).
+
+To use multitasking Unet (with organ classification and pixel size prediction), switch to the branch `baptiste/predict_organ_and_p_size`. You can view trained model in `notebooks/evaluate_model.ipynb`.
