@@ -26,7 +26,7 @@ def main_train(model, loss_fn, o_classif_loss_fn, p_s_classif_loss_fn, optimizer
         for X, organ, y, pixel_size in tqdm(dataloader):
             # 1. Forward pass
             model_output, organ_output, p_s_output = model(X.to(device))
-
+            print(organ_output, p_s_output)
             # 2. Calculate and accumulate loss
             loss = loss_fn(model_output,y.to(device)) #model_output[:,1,:,:] correspond au masque de la classe 2 = la zone d'intérêt, la classe 1 correpsond ua background
             o_classif_loss = o_classif_loss_fn(organ_output, organ.to(device))

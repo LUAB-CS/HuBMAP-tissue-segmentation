@@ -12,6 +12,7 @@ class CustomDataset(Dataset):
     def __init__(self, root_dir, reshape_size, transform=None):
         self.root_dir = root_dir
         self.transform = transform
+        self.reshape_size = reshape_size
         self.image_files = os.listdir(os.path.join(root_dir, "train_images"))
         self.label_files = os.listdir(os.path.join(root_dir, "train_masks"))
         self.meta_df = pd.read_csv(os.path.join(
@@ -43,8 +44,10 @@ class CustomDataset(Dataset):
         organ = self.encoded_organs[int(self.image_files[idx][:-5])]
         image_tensor = self.format_transform(image)
         label_tensor = self.format_transform(label)
+        image_size = self.meta_df[self.meta_df["id"] == int(self.image_files[idx][:-5])]["img_height"].values[0]
+        ratio = image_size / self.reshape_size  #ex : 512/3000 -> bigger picture, smaller pixel ?
         pixel_size = torch.tensor(
-            self.meta_df[int(self.image_files[idx][:-5])]["pixel_size"].values[0])
+                ratio * self.meta_df[self.meta_df["id"] == int(self.image_files[idx][:-5])]["pixel_size"].values[0]).type(torch.float32)
         if self.transform is not None:
             (image_tensor, label_tensor) = self.transform(
                 (image_tensor, label_tensor))
@@ -57,6 +60,7 @@ class DebugCustomDataset(Dataset):
     def __init__(self, root_dir, reshape_size, transform=None):
         self.root_dir = root_dir
         self.transform = transform
+        self.reshape_size = reshape_size
         self.image_files = os.listdir(
             os.path.join(root_dir, "debug_train_images"))
         self.label_files = os.listdir(
@@ -90,8 +94,10 @@ class DebugCustomDataset(Dataset):
         organ = self.encoded_organs[int(self.image_files[idx][:-5])]
         image_tensor = self.format_transform(image)
         label_tensor = self.format_transform(label)
+        image_size = self.meta_df[self.meta_df["id"] == int(self.image_files[idx][:-5])]["img_height"].values[0]
+        ratio = image_size / self.reshape_size  #ex : 512/3000 -> bigger picture, smaller pixel ?
         pixel_size = torch.tensor(
-            self.meta_df[self.meta_df["id"] == int(self.image_files[idx][:-5])]["pixel_size"].values[0]).type(torch.float32)
+            ratio * self.meta_df[self.meta_df["id"] == int(self.image_files[idx][:-5])]["pixel_size"].values[0]).type(torch.float32)
         if self.transform is not None:
             (image_tensor, label_tensor) = self.transform(
                 (image_tensor, label_tensor))

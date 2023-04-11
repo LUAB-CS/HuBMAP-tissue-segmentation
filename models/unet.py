@@ -84,8 +84,8 @@ class UNet(nn.Module):
         x3_0 = self.conv3_0(self.pool(x2_0))
         x4_0 = self.conv4_0(self.pool(x3_0))
         # print(x4_0.shape)
-        o_classif_output = nn.Sigmoid()(self.o_classifier(x4_0.flatten(start_dim=1)))
-        p_s_classif_output = nn.Sigmoid()(self.p_s_classifier(x4_0.flatten(start_dim=1)))
+        o_classif_output = self.o_classifier(x4_0.flatten(start_dim=1))
+        p_s_classif_output = self.p_s_classifier(x4_0.flatten(start_dim=1))
 
         x3_1 = self.conv3_1(torch.cat([x3_0, self.up(x4_0)], 1))
         x2_2 = self.conv2_2(torch.cat([x2_0, self.up(x3_1)], 1))
